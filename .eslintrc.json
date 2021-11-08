@@ -1,3 +1,104 @@
 {
-  "extends": "next/core-web-vitals"
+  "root": true,
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "extends": ["next/core-web-vitals", "airbnb/hooks", "eslint-config-prettier", "prettier"],
+  "plugins": ["babel", "react", "react-hooks", "prettier", "jsx-a11y", "import"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/internal-regex": "^next/"
+  },
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "babelOptions": {
+      "presets": ["@babel/preset-env", "@babel/preset-react"],
+      "caller": {
+        "supportsTopLevelAwait": true
+      }
+    }
+  },
+  "rules": {
+    "max-depth": ["warn", 4],
+    "max-len": ["warn", 150],
+    "id-length": ["warn", { "exceptions": ["i", "j", "e", "_", "$"], "min": 2 }],
+    "no-console": "warn",
+
+    "no-lonely-if": ["error"],
+    "no-plusplus": ["error", {"allowForLoopAfterthoughts": true}],
+    "jsx-a11y/label-has-associated-control": [ "error", { "assert": "either" }],
+
+    "no-restricted-syntax": "off",
+    "class-methods-use-this": "off",
+    "jsx-a11y/href-no-hash": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "curly": "off",
+    "react/state-in-constructor": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/static-property-placement": "off",
+    "import/prefer-default-export": "off",
+    "import/extensions": "off",
+    "import/no-unresolved": "off",
+    "react/jsx-filename-extension": "off",
+    "react-hooks/exhaustive-deps": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module",
+        "ecmaFeatures": {
+          "jsx": true
+        },
+        "warnOnUnsupportedTypeScriptVersion": false
+      },
+      "plugins": ["@typescript-eslint"],
+      "rules": {
+        // Already handled by TS
+        "no-dupe-class-members": "off",
+        "no-undef": "off",
+
+        "@typescript-eslint/consistent-type-assertions": "warn",
+        "no-array-constructor": "off",
+        "@typescript-eslint/no-array-constructor": "warn",
+        "@typescript-eslint/no-namespace": "error",
+        "no-use-before-define": "off",
+        "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/no-use-before-define": [
+          "warn",
+          {
+            "functions": false,
+            "classes": false,
+            "variables": false,
+            "typedefs": false
+          }
+        ],
+        "no-unused-vars": "off",
+        "no-unused-expressions": "off",
+        "@typescript-eslint/no-unused-expressions": [
+          "error",
+          {
+            "allowShortCircuit": true,
+            "allowTernary": true,
+            "allowTaggedTemplates": true
+          }
+        ],
+        "no-useless-constructor": "off",
+        "@typescript-eslint/no-useless-constructor": "warn"
+      }
+    }
+  ]
 }
