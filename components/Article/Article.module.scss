@@ -1,0 +1,85 @@
+.paper {
+  width: 900px;
+  margin: 25px auto;
+  padding: 15px 15px 25px 15px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.content {
+  width: 640px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  padding: 4px;
+}
+
+.title {
+  font-size: 20px;
+  color: #1890ff;
+}
+
+.likes {
+  margin-left: 10px;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.tags {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  margin: 5px 0;
+}
+
+.tag {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.75);
+
+  margin-right: 8px;
+  padding: 1px 4px;
+
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+}
+
+.description {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.user {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+
+  width: 230px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 170px;
+}
+
+.userName {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.created {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.avatar {
+  margin-left: 12px;
+
+  border-radius: 50%;
+}
