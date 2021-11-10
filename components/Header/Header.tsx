@@ -1,10 +1,14 @@
-import styles from './Header.module.scss';
+import Link from 'next/link';
 import { Button } from '@mui/material';
+
+import styles from './Header.module.scss';
 
 export function Header() {
   return (
     <div className={styles.header}>
-      <div className={styles.logo}>Realworld Blog</div>
+      <div className={styles.logo}>
+        <Link href="/">Realworld Blog</Link>
+      </div>
       <div className={styles.nonauthorized}>
         <Button className={styles.signin} variant="text">
           Sign In

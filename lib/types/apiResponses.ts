@@ -25,13 +25,19 @@ export interface Tags {
   tags: string[];
 }
 
-export interface Login {
+export interface DataToLogin {
   user: Pick<User, 'email' | 'password'>;
 }
 
-export interface Registration {
+export interface Login {
+  user: User;
+}
+
+export interface DataToRegistration {
   user: Pick<User, 'username' | 'email' | 'password'>;
 }
+
+export interface Registration extends Login {}
 
 export interface UserInfo {
   user: Pick<User, 'email' | 'token' | 'username' | 'bio' | 'image'>;

@@ -1,11 +1,12 @@
 .paper {
-  width: 900px;
-  margin: 25px auto;
-  padding: 15px 15px 25px 15px;
-
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  flex-wrap: wrap;
+
+  width: 900px;
+  margin: 25px auto;
+  padding: 15px 15px 25px 15px;
 }
 
 .content {
@@ -26,7 +27,12 @@
 }
 
 .likes {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
   margin-left: 10px;
+  line-height: 20px;
   color: rgba(0, 0, 0, 0.75);
 }
 
@@ -82,4 +88,34 @@
   margin-left: 12px;
 
   border-radius: 50%;
+}
+
+.heart {
+  font-size: 18px;
+  line-height: 20px;
+
+  &:hover {
+    transform: scale(1.2);
+    transition: 0.5s;
+  }
+}
+
+.heart-active {
+  font-size: 18px;
+  line-height: 20px;
+  color: hotpink;
+
+  &:hover {
+    transform: scale(1.2);
+    transition: 0.5s;
+  }
+}
+
+.likeCount {
+  margin-right: 2px;
+}
+
+.body {
+  flex-basis: 100%;
+  margin: 15px 0 25px;
 }
