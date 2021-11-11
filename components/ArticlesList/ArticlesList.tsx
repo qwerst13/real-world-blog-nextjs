@@ -1,11 +1,11 @@
 import useSWR from 'swr';
 
-import { fetcher } from '../../lib/helpers/fetcher';
+import { fetcherWithAuth } from '../../lib/helpers/fetcher';
 import { Article } from '../Article';
 import { SingleArticle } from '../../lib/types/apiResponses';
 
 export function ArticlesList() {
-  const { data, error } = useSWR('https://api.realworld.io/api/articles?limit=20&offset=0', fetcher);
+  const { data, error } = useSWR('https://api.realworld.io/api/articles?limit=20&offset=0', fetcherWithAuth);
 
   // TODO добавить лоадер и показ ошибок
   if (!data) return <div>loading...</div>;

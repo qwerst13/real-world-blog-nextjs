@@ -4,7 +4,7 @@ export interface Error {
   };
 }
 
-interface User {
+export interface User {
   username: string;
   email: string;
   password: string;
@@ -29,19 +29,17 @@ export interface DataToLogin {
   user: Pick<User, 'email' | 'password'>;
 }
 
-export interface Login {
-  user: User;
+export interface UserInfo {
+  user: Pick<User, 'email' | 'token' | 'username' | 'bio' | 'image'>;
 }
+
+export interface Login extends UserInfo {}
 
 export interface DataToRegistration {
   user: Pick<User, 'username' | 'email' | 'password'>;
 }
 
-export interface Registration extends Login {}
-
-export interface UserInfo {
-  user: Pick<User, 'email' | 'token' | 'username' | 'bio' | 'image'>;
-}
+export interface Registration extends UserInfo {}
 
 export interface UpdateUser extends UserInfo {}
 
@@ -49,7 +47,7 @@ export interface ProfileInfo {
   profile: Profile;
 }
 
-export interface UpdateProfile extends ProfileInfo {}
+export interface FollowUser extends ProfileInfo {}
 
 export interface UnfollowUser extends ProfileInfo {}
 
@@ -95,6 +93,10 @@ export interface Comment {
   updatedAt: string;
   body: string;
   author: Profile;
+}
+
+export interface GetComment {
+  comment: Comment;
 }
 
 export interface Comments {
