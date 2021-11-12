@@ -1,14 +1,20 @@
 import useSWR from 'swr';
+import { CircularProgress } from '@mui/material';
 
 import { fetcherWithAuth } from '../../lib/helpers/fetcher';
 import { Article } from '../Article';
 import { SingleArticle } from '../../lib/types/apiResponses';
 
 export function ArticlesList() {
-  const { data, error } = useSWR('https://api.realworld.io/api/articles?limit=20&offset=0', fetcherWithAuth);
+  const { data, error } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/articles?limit=20&offset=0`, fetcherWithAuth);
 
   // TODO добавить лоадер и показ ошибок
-  if (!data) return <div>loading...</div>;
+  if (!data)
+    return (
+      <div className="container">
+        <CircularProgress className="centered" />
+      </div>
+    );
 
   if (error) return <div>Error</div>;
 

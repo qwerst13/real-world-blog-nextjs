@@ -1,5 +1,5 @@
 export function getStorageItem(key: string): string | null {
-  return window.sessionStorage.getItem(key);
+  return window.localStorage.getItem(key);
 }
 
 export function setStorageItem(key: string, value: string): void {

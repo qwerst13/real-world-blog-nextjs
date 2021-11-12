@@ -11,20 +11,44 @@
   font-size: 24px;
   line-height: 60px;
 }
-.nonauthorized {
+.auth {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 }
-.authorized {
-  // TODO отображение зависящее от авторизации
-  display: none;
-}
+
 .signin {
   color: black;
   margin-right: 20px;
+  text-transform: none;
 }
 .signup {
   color: #52c41a;
   border: 1px solid #52c41a;
+  margin-right: 20px;
+  text-transform: none;
+}
+
+.create {
+  color: #52c41a;
+  border: 1px solid #52c41a;
+  margin-right: 20px;
+  text-transform: none;
+}
+
+.username {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.85);
+  margin-right: 20px;
+}
+.avatar {
+  border-radius: 50px;
+}
+.logout {
+  color: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.75);
+  margin-right: 20px;
+  margin-left: 20px;
+  text-transform: none;
 }

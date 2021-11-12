@@ -4,9 +4,11 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Image from 'next/image';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
 
 import { SingleArticle } from '../../lib/types/apiResponses';
 import { formatDate } from '../../lib/helpers/formatDate';
+import { proxyImage } from '../../lib/helpers/proxyImage';
 
 import styles from './Article.module.scss';
 
@@ -63,9 +65,13 @@ export function Article({
           <div className={styles.userName}>{username}</div>
           <div className={styles.created}>{formatDate(createdAt)}</div>
         </div>
-        <Image layout={'fixed'} className={styles.avatar} width={50} height={50} alt="user-image" src={image} />
+        <Image layout={'fixed'} className={styles.avatar} width={50} height={50} alt="user-image" src={proxyImage(image)} />
       </div>
-      {isFull && <div className={styles.body}>{body}</div>}
+      {isFull && (
+        <div className={styles.body}>
+          <ReactMarkdown>{body}</ReactMarkdown>
+        </div>
+      )}
     </Paper>
   );
 }
