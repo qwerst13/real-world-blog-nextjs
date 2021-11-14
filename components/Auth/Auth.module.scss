@@ -36,6 +36,10 @@
 
     border: 1px solid #d9d9d9;
     border-radius: 4px;
+
+    &.red {
+      border: 1px solid crimson;
+    }
   }
 }
 
@@ -61,6 +65,10 @@
 
     font-size: 14px;
     line-height: 22px;
+
+    .not-valid {
+      color: crimson;
+    }
   }
 }
 
@@ -83,4 +91,9 @@
   .link {
     color: #1890ff;
   }
+}
+
+.error-text {
+  font-size: 14px;
+  color: #f5222d;
 }
