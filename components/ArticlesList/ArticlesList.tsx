@@ -1,12 +1,13 @@
 import useSWR from 'swr';
 import { CircularProgress } from '@mui/material';
 
-import { fetcherWithAuth } from '../../lib/helpers/fetcher';
 import { Article } from '../Article';
 import { SingleArticle } from '../../lib/types/apiResponses';
+import { ConduitServices } from '../../lib/services/ConduitServices';
 
 export function ArticlesList() {
-  const { data, error } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/articles?limit=20&offset=0`, fetcherWithAuth);
+  const api = new ConduitServices();
+  const { data, error } = useSWR(`/articles`, () => api.getAllArticles());
 
   // TODO добавить лоадер и показ ошибок
   if (!data)
@@ -16,7 +17,7 @@ export function ArticlesList() {
       </div>
     );
 
-  if (error) return <div>Error</div>;
+  if (error || 'errors' in data) return <div>Error</div>;
 
   const elements = data.articles.map((article: SingleArticle) => <Article key={article.slug} {...article} isFull={false} />);
 

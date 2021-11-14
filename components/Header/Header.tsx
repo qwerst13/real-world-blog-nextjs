@@ -7,6 +7,7 @@ import { parseJwtPayload } from '../../lib/helpers/parseJwtPayload';
 import { getStorageItem } from '../../lib/helpers/localStorage';
 
 import styles from './Header.module.scss';
+import { proxyImage } from '../../lib/helpers/proxyImage';
 
 export function Header() {
   const { data: currentUser } = useSWR('user', () => {
@@ -50,7 +51,7 @@ export function Header() {
             </Link>
             <Link href="/profile" passHref>
               <a>
-                <Image layout={'fixed'} className={styles.avatar} width={50} height={50} alt="user-image" src={currentUser.image} />
+                <Image layout={'fixed'} className={styles.avatar} width={50} height={50} alt="user-image" src={proxyImage(currentUser.image)} />
               </a>
             </Link>
             <Button className={styles.logout} size="large" variant="outlined">

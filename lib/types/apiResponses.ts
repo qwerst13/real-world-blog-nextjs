@@ -25,8 +25,10 @@ export interface Tags {
   tags: string[];
 }
 
-export interface DataToLogin {
-  user: Pick<User, 'email' | 'password'>;
+export type DataToLogin = Pick<User, 'email' | 'password'>;
+
+export interface ResponseToLogin {
+  user: DataToLogin;
 }
 
 export interface UserInfo {
@@ -35,8 +37,10 @@ export interface UserInfo {
 
 export interface Login extends UserInfo {}
 
-export interface DataToRegistration {
-  user: Pick<User, 'username' | 'email' | 'password'>;
+export type DataToRegistration = Pick<User, 'username' | 'email' | 'password'>;
+
+export interface ResponseToRegistration {
+  user: DataToRegistration;
 }
 
 export interface Registration extends UserInfo {}

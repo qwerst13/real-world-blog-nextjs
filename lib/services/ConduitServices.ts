@@ -1,4 +1,5 @@
 import * as Types from '../types/apiResponses';
+import { DataToLogin, DataToRegistration, User } from '../types/apiResponses';
 
 type ReqType = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -26,22 +27,22 @@ export class ConduitServices {
     } else return { method, headers, body: JSON.stringify(body) };
   }
 
-  async login(email: string, password: string): Promise<Types.Login | Types.Error> {
+  async login(dataToLogin: DataToLogin): Promise<Types.Login | Types.Error> {
     const data = {
-      user: { email, password },
+      user: { ...dataToLogin },
     };
 
-    const response = await fetch(`${this.host}/users/login`, this.requestOptions<Types.DataToLogin>('POST', data));
+    const response = await fetch(`${this.host}/users/login`, this.requestOptions<typeof data>('POST', data));
 
     return response.json();
   }
 
-  async register(username: string, email: string, password: string): Promise<Types.Registration | Types.Error> {
+  async register(dataToRegistration: DataToRegistration): Promise<Types.Registration | Types.Error> {
     const data = {
-      user: { username, email, password },
+      user: { ...dataToRegistration },
     };
 
-    const response = await fetch(`${this.host}/users`, this.requestOptions<Types.DataToRegistration>('POST', data));
+    const response = await fetch(`${this.host}/users`, this.requestOptions<typeof data>('POST', data));
 
     return response.json();
   }
