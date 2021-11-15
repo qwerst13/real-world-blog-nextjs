@@ -1,23 +1,20 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import useSWR from 'swr';
 import { Button, CircularProgress } from '@mui/material';
-import { parseJwtPayload } from '../../lib/helpers/parseJwtPayload';
-import { getStorageItem } from '../../lib/helpers/localStorage';
+import { useRouter } from 'next/router';
 
 import styles from './Header.module.scss';
 import { proxyImage } from '../../lib/helpers/proxyImage';
+import { useSession } from '../../lib/hooks/useSession';
 
 export function Header() {
-  const { data: currentUser } = useSWR('user', () => {
-    const token = getStorageItem('jwt');
+  const router = useRouter();
+  const { currentUser, updateUser } = useSession();
 
-    return token ? parseJwtPayload(token) : undefined;
-  });
-
-  if (!currentUser) return <CircularProgress className="centered" />;
-
-  const isAuth = true;
+  function logout() {
+    updateUser(null);
+    router.push('/');
+  }
 
   return (
     <div className={styles.header}>
@@ -25,7 +22,7 @@ export function Header() {
         <Link href="/">Realworld Blog</Link>
       </div>
       <div className={styles.auth}>
-        {!isAuth && (
+        {!currentUser && (
           <>
             <Link href="/sign-in" passHref>
               <Button className={styles.signin} size="large" variant="text">
@@ -40,7 +37,7 @@ export function Header() {
           </>
         )}
 
-        {isAuth && (
+        {currentUser && (
           <>
             <Button className={styles.create} size="small" variant="outlined">
               Create article
@@ -53,7 +50,7 @@ export function Header() {
                 <Image layout={'fixed'} className={styles.avatar} width={50} height={50} alt="user-image" src={proxyImage(currentUser.image)} />
               </a>
             </Link>
-            <Button className={styles.logout} size="large" variant="outlined">
+            <Button className={styles.logout} size="large" variant="outlined" onClick={logout}>
               Log out
             </Button>
           </>

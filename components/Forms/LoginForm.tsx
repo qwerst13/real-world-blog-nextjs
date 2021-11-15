@@ -7,7 +7,9 @@ import { ConduitServices } from '../../lib/services/ConduitServices';
 import { DataToLogin } from '../../lib/types/apiResponses';
 import { emailValidationOptions, passwordValidationOptions } from '../../lib/helpers/validators';
 
-import styles from './Auth.module.scss';
+import styles from './Form.module.scss';
+import { useSession } from '../../lib/hooks/useSession';
+import { useRouter } from 'next/router';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -15,6 +17,8 @@ const api = new ConduitServices();
 interface FormData extends DataToLogin {}
 
 export function LoginForm() {
+  const router = useRouter();
+  const { updateUser } = useSession();
   const {
     register,
     handleSubmit,
@@ -29,7 +33,8 @@ export function LoginForm() {
       const message = data.errors;
       console.log(message);
     } else {
-      console.log(data);
+      updateUser(data.user);
+      router.push('/');
     }
   };
 

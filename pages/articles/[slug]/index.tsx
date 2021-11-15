@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { GetStaticProps, GetStaticPaths, InferGetStaticPropsType } from 'next';
-import { SingleArticle } from '../../lib/types/apiResponses';
+import { SingleArticle } from '../../../lib/types/apiResponses';
 
-import { Article } from '../../components/Article';
+import { Article } from '../../../components/Article';
 import { CircularProgress } from '@mui/material';
 
 type singleArticlePageProps = InferGetStaticPropsType<typeof getStaticProps>;

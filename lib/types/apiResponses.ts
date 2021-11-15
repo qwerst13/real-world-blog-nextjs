@@ -9,8 +9,8 @@ export interface User {
   email: string;
   password: string;
   token: string;
-  bio: string;
-  image: string;
+  bio: string | null;
+  image: string | null;
   following: true;
 }
 
@@ -31,8 +31,10 @@ export interface ResponseToLogin {
   user: DataToLogin;
 }
 
+export type UserData = Pick<User, 'email' | 'token' | 'username' | 'bio' | 'image'>;
+
 export interface UserInfo {
-  user: Pick<User, 'email' | 'token' | 'username' | 'bio' | 'image'>;
+  user: UserData;
 }
 
 export interface Login extends UserInfo {}
@@ -75,8 +77,10 @@ export interface AllArticles {
 
 export interface FollowedArticles extends AllArticles {}
 
+export type ArticleDataToCreate = Pick<SingleArticle, 'title' | 'description' | 'body' | 'tagList'>;
+
 export interface ArticleToCreate {
-  article: Pick<SingleArticle, 'title' | 'description' | 'body' | 'tagList'>;
+  article: ArticleDataToCreate;
 }
 
 export interface GetArticle {
@@ -85,8 +89,10 @@ export interface GetArticle {
 
 export interface CreateArticle extends GetArticle {}
 
+export type ArticleDataToUpdate = Pick<SingleArticle, 'title' | 'description' | 'body'>;
+
 export interface ArticleToUpdate {
-  article: Pick<SingleArticle, 'title' | 'description' | 'body'>;
+  article: ArticleDataToUpdate;
 }
 
 export interface UpdateArticle extends GetArticle {}

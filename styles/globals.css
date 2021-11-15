@@ -21,7 +21,13 @@ a {
   margin: 0;
   padding: 0;
 }
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
 .centered {
   text-align: center;
-  margin: auto auto;
+  margin: 25px auto;
 }

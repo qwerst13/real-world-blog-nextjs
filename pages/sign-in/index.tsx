@@ -1,6 +1,6 @@
 import Head from 'next/head';
 
-import { LoginForm } from '../../components/Auth';
+import { LoginForm } from '../../components/Forms';
 
 export default function SignInPage() {
   return (

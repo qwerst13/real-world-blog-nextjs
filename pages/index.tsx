@@ -1,13 +1,16 @@
 import Head from 'next/head';
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
-import { SWRConfig } from 'swr';
 import { Pagination } from '@mui/material';
 
 import { ArticlesList } from '../components/ArticlesList';
 
 import styles from '../styles/HomePage.module.css';
 
-export default function HomePage({ fallback }: InferGetStaticPropsType<typeof getStaticProps>) {
+type ServerProps = InferGetStaticPropsType<typeof getStaticProps>;
+
+interface HomePageProps extends ServerProps {}
+
+export default function HomePage({ fallback }: HomePageProps) {
   return (
     <>
       <Head>
@@ -15,9 +18,8 @@ export default function HomePage({ fallback }: InferGetStaticPropsType<typeof ge
         <meta name="description" content="List of all articles" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <SWRConfig value={{ fallback }}>
-        <ArticlesList />
-      </SWRConfig>
+
+      <ArticlesList />
       <Pagination className={styles.pagination} count={1} />
     </>
   );

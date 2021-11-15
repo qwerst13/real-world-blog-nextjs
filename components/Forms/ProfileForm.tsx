@@ -4,50 +4,47 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import classNames from 'classnames/bind';
 
 import { ConduitServices } from '../../lib/services/ConduitServices';
-import { DataToRegistration } from '../../lib/types/apiResponses';
-import {
-  usernameValidationOptions,
-  emailValidationOptions,
-  passwordValidationOptions,
-  repeatPasswordValidationOptions,
-  acceptValidationOptions,
-} from '../../lib/helpers/validators';
+import { UserData } from '../../lib/types/apiResponses';
+import { usernameValidationOptions, emailValidationOptions, avatarUrlValidationOptions } from '../../lib/helpers/validators';
 
-import styles from './Auth.module.scss';
+import styles from './Form.module.scss';
+import { useSession } from '../../lib/hooks/useSession';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
 
-interface FormData extends DataToRegistration {
-  repeatPassword: string;
-  rule: boolean;
+interface FormData extends UserData {
+  password: string;
 }
 
-export function SignUpForm() {
+export function ProfileForm() {
+  const { currentUser, updateUser } = useSession();
   const {
     register,
-    watch,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: { username: currentUser?.username, email: currentUser?.email, image: currentUser?.image, bio: currentUser?.bio },
+  });
 
-  const registration: SubmitHandler<FormData> = async ({ username, email, password }) => {
-    const data = await api.register({ username, email, password });
+  const updateProfile: SubmitHandler<FormData> = async ({ username, email, image, bio }) => {
+    const data = await api.updateCurrentUser({ username, email, bio, image });
 
     // TODO при ответе с сервера со статусом 200, но с ключом объекта errors: ['описание ошибки'] сделать соответствующий вывод, либо перенаправление на логин
     if ('errors' in data) {
       const message = data.errors;
       console.log(message);
     } else {
-      console.log(data);
+      // TODO модалка об успешном обновлении профиля
+      updateUser(data.user);
     }
   };
 
   return (
     <div className={styles.container}>
       <Paper className={styles.paper} elevation={2}>
-        <h3 className={styles.title}>Create a new account</h3>
-        <form onSubmit={handleSubmit(registration)}>
+        <h3 className={styles.title}>Edit Profile</h3>
+        <form onSubmit={handleSubmit(updateProfile)}>
           <div className={styles.field}>
             <div className={styles.label}>
               <label htmlFor="username">Username</label>
@@ -76,52 +73,29 @@ export function SignUpForm() {
 
           <div className={styles.field}>
             <div className={styles.label}>
-              <label htmlFor="password">Password</label>
+              <label htmlFor="image">Avatar image (url)</label>
             </div>
             <input
-              type="password"
-              placeholder="Password"
-              className={cn({ input: true, red: errors.password })}
-              {...register('password', passwordValidationOptions())}
+              type="text"
+              placeholder="Avatar image"
+              className={cn({ input: true, red: errors.image })}
+              {...register('image', avatarUrlValidationOptions())}
             />
-            {errors.password && <span className={styles['error-text']}>{errors.password.message}</span>}
+            {errors.image && <span className={styles['error-text']}>{errors.image.message}</span>}
           </div>
 
           <div className={styles.field}>
             <div className={styles.label}>
-              <label htmlFor="repeatPassword">Repeat Password</label>
+              <label htmlFor="bio">Tell something about you</label>
             </div>
-            <input
-              type="password"
-              placeholder="Password"
-              className={cn({ input: true, red: errors.repeatPassword })}
-              {...register('repeatPassword', repeatPasswordValidationOptions(watch('password'), watch('repeatPassword')))}
-            />
-            {errors.repeatPassword && <span className={styles['error-text']}>{errors.repeatPassword.message}</span>}
-          </div>
-
-          <hr className={styles.divider} />
-
-          <div className={styles.rule}>
-            <input className={cn({ rulebox: true, red: errors.rule })} type="checkbox" {...register('rule', acceptValidationOptions())} />
-            <div className={styles.description}>
-              <label htmlFor="rule">
-                <span className={cn({ 'not-valid': errors.rule })}>I agree to the processing of my personal information</span>
-              </label>
-            </div>
+            <textarea cols={3} placeholder="But not too much ;)" className={cn({ area: true, red: errors.bio })} {...register('bio')} />
+            {errors.bio && <span className={styles['error-text']}>{errors.bio.message}</span>}
           </div>
 
           <Button type="submit" className={styles.create} size="large" variant="contained">
-            Create
+            Save
           </Button>
         </form>
-
-        <div className={styles.change}>
-          Already have an account?{' '}
-          <Link href="/sign-in">
-            <a className={styles.link}>Sign In</a>
-          </Link>
-        </div>
       </Paper>
     </div>
   );

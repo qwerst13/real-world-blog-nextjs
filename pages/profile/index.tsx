@@ -1,6 +1,6 @@
 import Head from 'next/head';
 
-import { Profile } from '../../components/Profile';
+import { ProfileForm } from '../../components/Forms';
 
 export default function ProfilePage() {
   return (
@@ -10,7 +10,7 @@ export default function ProfilePage() {
         <meta name="description" content="Enter to account" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Profile />
+      <ProfileForm />
     </>
   );
 }

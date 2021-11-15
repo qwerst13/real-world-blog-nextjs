@@ -1,18 +1,16 @@
 import * as Types from '../types/apiResponses';
-import { DataToLogin, DataToRegistration, User } from '../types/apiResponses';
+import { DataToLogin, DataToRegistration } from '../types/apiResponses';
+import { getStorageItem } from '../helpers/localStorage';
 
 type ReqType = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export class ConduitServices {
-  private host = process.env.NEXT_PUBLIC_API_URL;
-  private storageKey = 'jwt';
-
-  static getStorageItem(key: string): string | null {
-    return window.localStorage.getItem(key);
-  }
+  private host = process.env.NEXT_PUBLIC_API_URL as string;
+  private storageKey = process.env.NEXT_PUBLIC_STORAGE_KEY as string;
 
   private requestOptions<T>(method: ReqType, body?: T) {
-    const token = ConduitServices.getStorageItem(this.storageKey);
+    const token: string | undefined = getStorageItem(this.storageKey) ? JSON.parse(getStorageItem(this.storageKey) as string).token : undefined;
+
     const headers: any = token
       ? {
           'Content-Type': 'application/json',
@@ -53,9 +51,7 @@ export class ConduitServices {
     return response.json();
   }
 
-  async updateCurrentUser(
-    dataObj: Partial<Pick<Types.User, 'email' | 'token' | 'username' | 'bio' | 'image'>>
-  ): Promise<Types.UpdateUser | Types.Error> {
+  async updateCurrentUser(dataObj: Partial<Types.UserData>): Promise<Types.UpdateUser | Types.Error> {
     const data = {
       user: dataObj,
     };
