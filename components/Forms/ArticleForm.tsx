@@ -1,15 +1,19 @@
 import { Button, Paper } from '@mui/material';
 import Link from 'next/link';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useRouter } from 'next/router';
+import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
 import classNames from 'classnames/bind';
 
 import { ConduitServices } from '../../lib/services/ConduitServices';
 import { ArticleDataToCreate, ArticleDataToUpdate } from '../../lib/types/apiResponses';
 import {} from '../../lib/helpers/validators';
+import { TagList } from '../TagList';
+import { Input } from '../Input';
+
+import { useSession } from '../../lib/hooks/useSession';
 
 import styles from './Form.module.scss';
-import { useSession } from '../../lib/hooks/useSession';
-import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -24,9 +28,11 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<ArticleDataToCreate>();
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({ control, name: 'tagList' });
 
   const createArticle: SubmitHandler<ArticleDataToCreate> = async ({ title, description, body, tagList }) => {
     const data = await api.createArticle({ title, description, body, tagList });
@@ -51,6 +57,10 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
       // TODO обработка ответа
     }
   };
+
+  useEffect(() => {
+    append(['1234']);
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -96,6 +106,18 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
             />
             {errors.body && <span className={styles['error-text']}>{errors.body.message}</span>}
           </div>
+
+          {fields.map((field, index) => (
+            <div key={field.id} className={styles.field}>
+              <input type="text" placeholder="Tag" className={cn({ input: true })} {...register(`tagList.${index}.tag` as const)} />
+              <Button className={cn({ button: true, add: true })} variant="outlined" onClick={() => append(index)}>
+                Add Tag
+              </Button>
+              <Button className={cn({ button: true, delete: true })} variant="outlined" onClick={() => remove(index)}>
+                Delete
+              </Button>
+            </div>
+          ))}
 
           <Button type="submit" className={styles.create} size="large" variant="contained">
             Send
