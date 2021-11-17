@@ -77,10 +77,10 @@ export interface AllArticles {
 
 export interface FollowedArticles extends AllArticles {}
 
-export type ArticleDataToCreate = Pick<SingleArticle, 'title' | 'description' | 'body' | 'tagList'>;
+export type FormData = Pick<SingleArticle, 'title' | 'description' | 'body' | 'tagList'>;
 
 export interface ArticleToCreate {
-  article: ArticleDataToCreate;
+  article: FormData;
 }
 
 export interface GetArticle {

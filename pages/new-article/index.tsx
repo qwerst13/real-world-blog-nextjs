@@ -1,9 +1,8 @@
 import Head from 'next/head';
-import { GetStaticProps, InferGetStaticPropsType } from 'next';
 
 import { ArticleForm } from '../../components/Forms/ArticleForm';
 
-export default function ProfilePage() {
+export default function NewArticlePage() {
   return (
     <>
       <Head>
@@ -14,4 +13,12 @@ export default function ProfilePage() {
       <ArticleForm isNew={true} />
     </>
   );
+}
+
+export async function getStaticProps() {
+  return {
+    props: {
+      protected: true,
+    },
+  };
 }

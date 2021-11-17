@@ -24,7 +24,7 @@ export default function SingleArticlePage({ data }: singleArticlePageProps) {
 export const getStaticPaths: GetStaticPaths = async () => {
   // TODO после создания класса-сервиса прописать пути
   return {
-    paths: [{ params: { slug: 'Welcome-to-RealWorld-project-1' } }],
+    paths: [],
     fallback: true,
   };
 };

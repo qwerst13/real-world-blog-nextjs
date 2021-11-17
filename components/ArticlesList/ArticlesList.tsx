@@ -1,9 +1,10 @@
 import useSWR from 'swr';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Pagination } from '@mui/material';
 
 import { Article } from '../Article';
 import { SingleArticle } from '../../lib/types/apiResponses';
 import { ConduitServices } from '../../lib/services/ConduitServices';
+import styles from '../../styles/HomePage.module.css';
 
 export function ArticlesList() {
   const api = new ConduitServices();
@@ -21,5 +22,10 @@ export function ArticlesList() {
 
   const elements = data.articles.map((article: SingleArticle) => <Article key={article.slug} {...article} isFull={false} />);
 
-  return <>{elements}</>;
+  return (
+    <>
+      {elements}
+      <Pagination className={styles.pagination} count={Math.ceil(data.articlesCount / 20)} />
+    </>
+  );
 }

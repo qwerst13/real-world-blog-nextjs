@@ -43,6 +43,10 @@
     }
   }
 
+  .input-tag {
+    width: 300px;
+  }
+
   .area {
     height: auto;
     width: 100%;
@@ -117,4 +121,31 @@
 .error-text {
   font-size: 14px;
   color: #f5222d;
+}
+
+.tags {
+  display: flex;
+  flex-direction: row;
+
+  width: 620px;
+}
+
+.button {
+  margin-left: 15px;
+  height: 40px;
+  width: 120px;
+
+  text-transform: none;
+}
+
+.send {
+  width: 300px;
+}
+
+.add {
+}
+
+.delete {
+  color: #f5222d;
+  border: 1px solid #f5222d;
 }

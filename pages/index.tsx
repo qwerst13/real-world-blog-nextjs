@@ -20,7 +20,6 @@ export default function HomePage({ fallback }: HomePageProps) {
       </Head>
 
       <ArticlesList />
-      <Pagination className={styles.pagination} count={1} />
     </>
   );
 }

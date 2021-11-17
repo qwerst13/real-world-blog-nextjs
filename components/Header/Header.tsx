@@ -13,7 +13,7 @@ export function Header() {
 
   function logout() {
     updateUser(null);
-    router.push('/');
+    router.replace('/sign-in');
   }
 
   return (
@@ -40,7 +40,7 @@ export function Header() {
         {currentUser && (
           <>
             <Button className={styles.create} size="small" variant="outlined">
-              Create article
+              <Link href="/new-article">Create article</Link>
             </Button>
             <Link href="/profile">
               <a className={styles.username}>{currentUser.username}</a>
