@@ -4,15 +4,20 @@ import { CircularProgress } from '@mui/material';
 
 import { Article } from '../../../components/Article';
 import { ConduitServices } from '../../../lib/services/ConduitServices';
+import useSWR from 'swr';
+import Head from 'next/head';
 
 const api = new ConduitServices();
 
-type singleArticlePageProps = InferGetStaticPropsType<typeof getStaticProps>;
+type ServerProps = InferGetStaticPropsType<typeof getStaticProps>;
+interface singleArticlePageProps extends ServerProps {}
 
-export default function SingleArticlePage({ data }: singleArticlePageProps) {
+export default function SingleArticlePage({ _ }: singleArticlePageProps) {
   const router = useRouter();
+  const { slug } = router.query;
+  const { data, error } = useSWR(`/api/article/${slug}`, () => api.getArticle(slug as string));
 
-  if (router.isFallback) {
+  if (router.isFallback || !data) {
     return (
       <div className="container">
         <CircularProgress className="centered" />
@@ -20,7 +25,19 @@ export default function SingleArticlePage({ data }: singleArticlePageProps) {
     );
   }
 
-  return <Article isFull={true} {...data.article} />;
+  // TODO добавить компонент ошибки
+  if ('errors' in data || error) return <div>Error</div>;
+
+  return (
+    <>
+      <Head>
+        <title>{data.article.title}</title>
+        <meta name="description" content={data.article.description} />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Article isFull={true} {...data.article} />
+    </>
+  );
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -44,6 +61,19 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   try {
     data = await api.getArticle(params!.slug as string);
+
+    if (!('errors' in data)) {
+      const { article } = data;
+
+      return {
+        props: {
+          fallback: {
+            [`/api/article/${article.slug}`]: article,
+          },
+        },
+        revalidate: 30,
+      };
+    }
   } catch (_) {
     return {
       notFound: true,
@@ -51,7 +81,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   return {
-    props: { data },
-    revalidate: 30,
+    notFound: true,
   };
 };

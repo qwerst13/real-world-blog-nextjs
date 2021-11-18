@@ -12,7 +12,7 @@ import { proxyImage } from '../../lib/helpers/proxyImage';
 import { ConduitServices } from '../../lib/services/ConduitServices';
 
 import styles from './Article.module.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const api = new ConduitServices();
 
@@ -34,6 +34,11 @@ export function Article({
 }: ArticleProps) {
   const [likesCount, setlikesCount] = useState<number>(favoritesCount);
   const [isFavorited, setIsFavorited] = useState<boolean>(favorited);
+
+  //This effect update server-side data since it doesn't know about authentication
+  useEffect(() => {
+    setIsFavorited(favorited);
+  }, [favorited]);
 
   async function handleLike() {
     let article: GetArticle | Error;
@@ -58,7 +63,7 @@ export function Article({
           <div className={styles.title}>
             <Link href={`/articles/${slug}`}>{title}</Link>
           </div>
-          <Heart count={likesCount} favorited={favorited} onClick={handleLike} />
+          <Heart count={likesCount} favorited={isFavorited} onClick={handleLike} />
         </div>
         <Tags tagList={tagList} />
         <div className={styles.description}>{description}</div>

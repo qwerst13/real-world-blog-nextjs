@@ -1,33 +1,10 @@
-import useSWR from 'swr';
-import { CircularProgress, Pagination } from '@mui/material';
-
 import { Article } from '../Article';
-import { SingleArticle } from '../../lib/types/apiResponses';
-import { ConduitServices } from '../../lib/services/ConduitServices';
-import styles from '../../styles/HomePage.module.css';
+import { AllArticles } from '../../lib/types/apiResponses';
 
-export function ArticlesList() {
-  const api = new ConduitServices();
-  const { data, error, isValidating } = useSWR(`/api/articles`, () => api.getAllArticles());
-  console.log(data);
-  console.log(isValidating);
+interface ArticlesListProps extends AllArticles {}
 
-  // TODO добавить лоадер и показ ошибок
-  if (!data)
-    return (
-      <div className="container">
-        <CircularProgress className="centered" />
-      </div>
-    );
+export function ArticlesList({ articles }: ArticlesListProps) {
+  const elements = articles.map((article) => <Article key={article.slug} {...article} isFull={false} />);
 
-  if (error || 'errors' in data) return <div>Error</div>;
-
-  const elements = data.articles.map((article: SingleArticle) => <Article key={article.slug} {...article} isFull={false} />);
-
-  return (
-    <>
-      {elements}
-      <Pagination className={styles.pagination} count={Math.ceil(data.articlesCount / 20)} />
-    </>
-  );
+  return <>{elements}</>;
 }

@@ -119,8 +119,8 @@ export class ConduitServices {
     }
   }
 
-  async getAllArticles(qty: number = 20, page: number = 0): Promise<Types.AllArticles | Types.Error> {
-    const queryString = `?limit=${qty}&offset=${page * qty}`;
+  async getAllArticles(limit: number = 20, offset: number = 0): Promise<Types.AllArticles | Types.Error> {
+    const queryString = `?limit=${limit}&offset=${offset}`;
 
     try {
       const response = await fetch(`${this.host}/articles${queryString}`, this.requestOptions('GET'));
