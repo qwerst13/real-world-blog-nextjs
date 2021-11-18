@@ -1,16 +1,20 @@
-import { useState } from 'react';
-import { Paper } from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Image from 'next/image';
 import Link from 'next/link';
-import ReactMarkdown from 'react-markdown';
 
-import { SingleArticle } from '../../lib/types/apiResponses';
+import ReactMarkdown from 'react-markdown';
+import { Paper } from '@mui/material';
+
+import { Tags } from '../Tags';
+import { Heart } from '../Heart';
+import { GetArticle, SingleArticle, Error } from '../../lib/types/apiResponses';
 import { formatDate } from '../../lib/helpers/formatDate';
 import { proxyImage } from '../../lib/helpers/proxyImage';
+import { ConduitServices } from '../../lib/services/ConduitServices';
 
 import styles from './Article.module.scss';
+import { useState } from 'react';
+
+const api = new ConduitServices();
 
 interface ArticleProps extends SingleArticle {
   isFull: boolean;
@@ -28,18 +32,24 @@ export function Article({
   body,
   isFull,
 }: ArticleProps) {
-  const [isFavorite, setIsFavorite] = useState<boolean>(favorited);
+  const [likesCount, setlikesCount] = useState<number>(favoritesCount);
+  const [isFavorited, setIsFavorited] = useState<boolean>(favorited);
 
-  function onLike() {
-    // TODO запрос на сервер
-    setIsFavorite((prevState) => !prevState);
+  async function handleLike() {
+    let article: GetArticle | Error;
+    if (isFavorited) {
+      article = await api.unfavoriteArticle(slug);
+    } else {
+      article = await api.favoriteArticle(slug);
+    }
+
+    if (!('errors' in article)) {
+      const { favorited, favoritesCount } = article.article;
+
+      setlikesCount(favoritesCount);
+      setIsFavorited(favorited);
+    }
   }
-
-  const tags = tagList.map((tag) => (
-    <div key={tag} className={styles.tag}>
-      {tag}
-    </div>
-  ));
 
   return (
     <Paper className={styles.paper} elevation={2}>
@@ -48,16 +58,9 @@ export function Article({
           <div className={styles.title}>
             <Link href={`/articles/${slug}`}>{title}</Link>
           </div>
-          <div className={styles.likes}>
-            <div className={styles.likeCount}>{favoritesCount}</div>
-            {isFavorite ? (
-              <FavoriteIcon onClick={onLike} className={styles['heart-active']} fontSize="inherit" />
-            ) : (
-              <FavoriteBorderIcon onClick={onLike} className={styles.heart} fontSize="inherit" />
-            )}
-          </div>
+          <Heart count={likesCount} favorited={favorited} onClick={handleLike} />
         </div>
-        <div className={styles.tags}>{tags}</div>
+        <Tags tagList={tagList} />
         <div className={styles.description}>{description}</div>
       </div>
       <div className={styles.user}>

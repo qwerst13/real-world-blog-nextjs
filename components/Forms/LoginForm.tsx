@@ -1,7 +1,10 @@
-import { Button, Paper } from '@mui/material';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import classNames from 'classnames/bind';
+import { Paper } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import { ConduitServices } from '../../lib/services/ConduitServices';
 import { DataToLogin } from '../../lib/types/apiResponses';
@@ -9,7 +12,6 @@ import { emailValidationOptions, passwordValidationOptions } from '../../lib/hel
 
 import styles from './Form.module.scss';
 import { useSession } from '../../lib/hooks/useSession';
-import { useRouter } from 'next/router';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -17,6 +19,7 @@ const api = new ConduitServices();
 interface FormData extends DataToLogin {}
 
 export function LoginForm() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
   const { updateUser } = useSession();
   const {
@@ -26,15 +29,17 @@ export function LoginForm() {
   } = useForm<FormData>();
 
   const login: SubmitHandler<FormData> = async ({ email, password }) => {
+    setIsLoading(true);
     const data = await api.login({ email, password });
 
     // TODO при ответе с сервера со статусом 200, но с ключом объекта errors: ['описание ошибки'] сделать соответствующий вывод
+    // TODO не забыть отключить загрузку в кнопке при ошибке
     if ('errors' in data) {
       const message = data.errors;
       console.log(message);
     } else {
       updateUser(data.user);
-      router.push('/');
+      router.push('/').then(() => setIsLoading(false));
     }
   };
 
@@ -70,9 +75,9 @@ export function LoginForm() {
             {errors.password && <span className={styles['error-text']}>{errors.password.message}</span>}
           </div>
 
-          <Button type="submit" className={styles.create} size="large" variant="contained">
+          <LoadingButton loading={isLoading} type="submit" className={styles.create} size="large" variant="contained">
             Login
-          </Button>
+          </LoadingButton>
         </form>
 
         <div className={styles.change}>

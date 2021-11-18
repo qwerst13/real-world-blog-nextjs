@@ -1,7 +1,10 @@
-import { Button, Paper } from '@mui/material';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import classNames from 'classnames/bind';
+import { Paper } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import { ConduitServices } from '../../lib/services/ConduitServices';
 import { DataToRegistration } from '../../lib/types/apiResponses';
@@ -12,10 +15,9 @@ import {
   repeatPasswordValidationOptions,
   acceptValidationOptions,
 } from '../../lib/helpers/validators';
+import { useSession } from '../../lib/hooks/useSession';
 
 import styles from './Form.module.scss';
-import { useSession } from '../../lib/hooks/useSession';
-import { useRouter } from 'next/router';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -26,6 +28,7 @@ interface FormData extends DataToRegistration {
 }
 
 export function SignUpForm() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
   const { updateUser } = useSession();
   const {
@@ -36,15 +39,17 @@ export function SignUpForm() {
   } = useForm<FormData>();
 
   const registration: SubmitHandler<FormData> = async ({ username, email, password }) => {
+    setIsLoading(true);
     const data = await api.register({ username, email, password });
 
     // TODO при ответе с сервера со статусом 200, но с ключом объекта errors: ['описание ошибки'] сделать соответствующий вывод, либо перенаправление на логин
+    // TODO не забыть отключить загрузку в кнопке при ошибке
     if ('errors' in data) {
       const message = data.errors;
       console.log(message);
     } else {
       updateUser(data.user);
-      router.push('/');
+      router.push('/').then(() => setIsLoading(false));
     }
   };
 
@@ -116,9 +121,9 @@ export function SignUpForm() {
             </div>
           </div>
 
-          <Button type="submit" className={styles.create} size="large" variant="contained">
+          <LoadingButton loading={isLoading} type="submit" className={styles.create} size="large" variant="contained">
             Create
-          </Button>
+          </LoadingButton>
         </form>
 
         <div className={styles.change}>

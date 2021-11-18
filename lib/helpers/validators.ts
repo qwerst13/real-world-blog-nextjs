@@ -4,8 +4,8 @@ export function emailValidationOptions(): RegisterOptions {
   return {
     required: 'This field is required',
     pattern: {
-      // eslint-disable-next-line max-len
       value:
+        // eslint-disable-next-line max-len
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       message: 'Your email should be valid',
     },
@@ -21,7 +21,7 @@ export function passwordValidationOptions(): RegisterOptions {
     },
     maxLength: {
       value: 40,
-      message: 'Whoa! No need for that strong pass',
+      message: 'Whoa! No need for that long pass',
     },
   };
 }

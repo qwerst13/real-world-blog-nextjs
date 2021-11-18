@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
+import { SWRConfig } from 'swr';
 import { Pagination } from '@mui/material';
 
 import { ArticlesList } from '../components/ArticlesList';
@@ -18,8 +19,9 @@ export default function HomePage({ fallback }: HomePageProps) {
         <meta name="description" content="List of all articles" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <ArticlesList />
+      <SWRConfig value={{ fallback }}>
+        <ArticlesList />
+      </SWRConfig>
     </>
   );
 }
@@ -27,12 +29,12 @@ export default function HomePage({ fallback }: HomePageProps) {
 //TODO подумать про использование т.к. это одна из 2-х страниц, которым потенциально нужна прегенерация
 export const getStaticProps: GetStaticProps = async () => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles?limit=20&offset=0`);
-  const article = await response.json();
+  const articles = await response.json();
 
   return {
     props: {
       fallback: {
-        '/api/article': article,
+        '/api/articles': articles,
       },
     },
     revalidate: 30,

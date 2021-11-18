@@ -1,9 +1,11 @@
 import { useRouter } from 'next/router';
 import { GetStaticProps, GetStaticPaths, InferGetStaticPropsType } from 'next';
-import { SingleArticle } from '../../../lib/types/apiResponses';
+import { CircularProgress } from '@mui/material';
 
 import { Article } from '../../../components/Article';
-import { CircularProgress } from '@mui/material';
+import { ConduitServices } from '../../../lib/services/ConduitServices';
+
+const api = new ConduitServices();
 
 type singleArticlePageProps = InferGetStaticPropsType<typeof getStaticProps>;
 
@@ -22,21 +24,31 @@ export default function SingleArticlePage({ data }: singleArticlePageProps) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // TODO после создания класса-сервиса прописать пути
+  const articles = await api.getAllArticles();
+  if ('errors' in articles)
+    return {
+      paths: [],
+      fallback: true,
+    };
+
+  const paths = articles.articles.map(({ slug }) => ({ params: { slug } }));
+
   return {
-    paths: [],
+    paths,
     fallback: true,
   };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${params!.slug}`);
-  const data: SingleArticle = await res.json();
+  let data;
 
-  if (!data)
+  try {
+    data = await api.getArticle(params!.slug as string);
+  } catch (_) {
     return {
       notFound: true,
     };
+  }
 
   return {
     props: { data },

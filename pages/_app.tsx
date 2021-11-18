@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { SWRConfig } from 'swr';
 
-import { Layout } from '../lib/ui/Layout';
+import { Layout } from '../components/ui/Layout';
 import { useSession } from '../lib/hooks/useSession';
 
 import '../styles/globals.css';

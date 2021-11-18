@@ -8,7 +8,9 @@ import styles from '../../styles/HomePage.module.css';
 
 export function ArticlesList() {
   const api = new ConduitServices();
-  const { data, error } = useSWR(`/articles`, () => api.getAllArticles());
+  const { data, error, isValidating } = useSWR(`/api/articles`, () => api.getAllArticles());
+  console.log(data);
+  console.log(isValidating);
 
   // TODO добавить лоадер и показ ошибок
   if (!data)

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { Header } from '../../../components/Header';
+import { Header } from '../../Header';
 
 import { StyledEngineProvider } from '@mui/material/styles';
 import styles from './Layout.module.scss';

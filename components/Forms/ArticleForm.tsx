@@ -1,19 +1,15 @@
-import { useState } from 'react';
-import { Button, Paper } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
 import classNames from 'classnames/bind';
+import { Button, Paper } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import { ConduitServices } from '../../lib/services/ConduitServices';
-import { ArticleDataToUpdate } from '../../lib/types/apiResponses';
-import {} from '../../lib/helpers/validators';
-
 import { useSession } from '../../lib/hooks/useSession';
 
 import styles from './Form.module.scss';
-import { useEffect } from 'react';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -32,6 +28,7 @@ interface FormData {
 
 export function ArticleForm({ isNew, slug }: ArticleFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const {
     register,
@@ -54,7 +51,7 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
       const message = data.errors;
       console.log(message);
     } else {
-      // TODO обработка ответа
+      router.push('/');
     }
   };
 
@@ -67,7 +64,7 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
       const message = data.errors;
       console.log(message);
     } else {
-      // TODO обработка ответа
+      router.push('/');
     }
   };
 
