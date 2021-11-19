@@ -7,7 +7,7 @@ import { ConduitServices } from '../../lib/services/ConduitServices';
 import { UserData } from '../../lib/types/apiResponses';
 import { usernameValidationOptions, emailValidationOptions, avatarUrlValidationOptions } from '../../lib/helpers/validators';
 
-import styles from './Form.module.scss';
+import styles from '../../styles/Form.module.scss';
 import { useSession } from '../../lib/hooks/useSession';
 
 let cn = classNames.bind(styles);

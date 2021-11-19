@@ -8,8 +8,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 import { ConduitServices } from '../../lib/services/ConduitServices';
 import { useSession } from '../../lib/hooks/useSession';
+import { Input } from '../Input';
+import { TagList } from '../TagList';
 
-import styles from './Form.module.scss';
+import styles from '../../styles/Form.module.scss';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -24,6 +26,7 @@ interface FormData {
   description: string;
   body: string;
   tagList: { tag: string }[];
+  test: string;
 }
 
 export function ArticleForm({ isNew, slug }: ArticleFormProps) {
@@ -37,7 +40,6 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
     setFocus,
     formState: { errors },
   } = useForm<FormData>({ defaultValues: { tagList: [{ tag: '' }] } });
-
   const { fields, prepend, remove } = useFieldArray({ name: 'tagList', control });
 
   const createArticle: SubmitHandler<FormData> = async ({ title, description, body, tagList }) => {
@@ -78,58 +80,38 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
         <h3 className={styles.title}>{isNew ? 'Create new article' : 'Edit article'}</h3>
 
         <form onSubmit={isNew ? handleSubmit(createArticle) : handleSubmit(updateArticle)}>
-          <div className={cn('field', 'article')}>
-            <div className={styles.label}>
-              <label htmlFor="title">Title</label>
-            </div>
-            <input
-              type="text"
-              placeholder="Title"
-              className={cn({ input: true, red: errors.title })}
-              {...register('title', { required: "Title can't be empty" })}
-            />
-            {errors.title && <span className={styles['error-text']}>{errors.title.message}</span>}
-          </div>
+          <Input
+            type="text"
+            name="title"
+            label={'Title'}
+            placeholder="Title"
+            error={errors.title}
+            register={register}
+            validationOptions={{ required: "Title can't be empty" }}
+          />
 
-          <div className={cn('field', 'article')}>
-            <div className={styles.label}>
-              <label htmlFor="description">Description</label>
-            </div>
-            <input
-              type="text"
-              placeholder="Description"
-              className={cn({ input: true, red: errors.description })}
-              {...register('description', { required: 'Enter a description' })}
-            />
-            {errors.description && <span className={styles['error-text']}>{errors.description.message}</span>}
-          </div>
+          <Input
+            type="text"
+            name="description"
+            label={'Description'}
+            placeholder="Description"
+            error={errors.description}
+            register={register}
+            validationOptions={{ required: 'Enter a description' }}
+          />
 
-          <div className={cn('field', 'article')}>
-            <div className={styles.label}>
-              <label htmlFor="body">Text</label>
-            </div>
-            <textarea
-              rows={10}
-              placeholder="Enter a text in markdown format"
-              className={cn({ area: true, red: errors.body })}
-              {...register('body', { required: 'Enter a text' })}
-            />
-            {errors.body && <span className={styles['error-text']}>{errors.body.message}</span>}
-          </div>
+          <Input
+            type="textarea"
+            rows={10}
+            name="body"
+            label={'Text'}
+            placeholder="Enter a text in markdown format"
+            error={errors.body}
+            register={register}
+            validationOptions={{ required: 'Enter a text' }}
+          />
 
-          {fields.map((field, index) => (
-            <div key={field.id} className={cn('field', 'tags')}>
-              <input type="text" placeholder="Tag" className={cn('input', 'input-tag')} {...register(`tagList.${index}.tag` as const)} />
-              {!index && (
-                <Button className={cn('button', 'add')} variant="outlined" onClick={() => prepend({ tag: '' })}>
-                  Add Tag
-                </Button>
-              )}
-              <Button className={cn('button', 'delete')} variant="outlined" onClick={() => remove(index)}>
-                Delete
-              </Button>
-            </div>
-          ))}
+          <TagList fields={fields} register={register} prepend={prepend} remove={remove} />
 
           <LoadingButton loading={isLoading} type="submit" className={cn('create', 'send')} size="large" variant="contained">
             Send

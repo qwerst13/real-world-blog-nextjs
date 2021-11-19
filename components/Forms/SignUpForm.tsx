@@ -17,7 +17,7 @@ import {
 } from '../../lib/helpers/validators';
 import { useSession } from '../../lib/hooks/useSession';
 
-import styles from './Form.module.scss';
+import styles from '../../styles/Form.module.scss';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
