@@ -9,9 +9,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { ConduitServices } from '../../lib/services/ConduitServices';
 import { DataToLogin } from '../../lib/types/apiResponses';
 import { emailValidationOptions, passwordValidationOptions } from '../../lib/helpers/validators';
+import { useSession } from '../../lib/hooks/useSession';
 
 import styles from '../../styles/Form.module.scss';
-import { useSession } from '../../lib/hooks/useSession';
+import { Input } from '../Input';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -49,31 +50,25 @@ export function LoginForm() {
         <h3 className={styles.title}>Sign In</h3>
 
         <form onSubmit={handleSubmit(login)}>
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="email">Email address</label>
-            </div>
-            <input
-              type="email"
-              placeholder="Email address"
-              className={cn({ input: true, red: errors.email })}
-              {...register('email', emailValidationOptions())}
-            />
-            {errors.email && <span className={styles['error-text']}>{errors.email.message}</span>}
-          </div>
+          <Input
+            type="email"
+            name="email"
+            label="Email address"
+            placeholder="Email address"
+            error={errors.email}
+            register={register}
+            validationOptions={emailValidationOptions()}
+          />
 
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="password">Password</label>
-            </div>
-            <input
-              type="password"
-              placeholder="Password"
-              className={cn({ input: true, red: errors.password })}
-              {...register('password', passwordValidationOptions())}
-            />
-            {errors.password && <span className={styles['error-text']}>{errors.password.message}</span>}
-          </div>
+          <Input
+            type="password"
+            name="password"
+            label="Password"
+            placeholder="Password"
+            error={errors.password}
+            register={register}
+            validationOptions={passwordValidationOptions()}
+          />
 
           <LoadingButton loading={isLoading} type="submit" className={styles.create} size="large" variant="contained">
             Login

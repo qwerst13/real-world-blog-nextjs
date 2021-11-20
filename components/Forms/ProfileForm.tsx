@@ -1,14 +1,16 @@
-import { Button, Paper } from '@mui/material';
-import Link from 'next/link';
+import { Paper } from '@mui/material';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import classNames from 'classnames/bind';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import { ConduitServices } from '../../lib/services/ConduitServices';
 import { UserData } from '../../lib/types/apiResponses';
 import { usernameValidationOptions, emailValidationOptions, avatarUrlValidationOptions } from '../../lib/helpers/validators';
+import { useSession } from '../../lib/hooks/useSession';
+import { Input } from '../Input';
 
 import styles from '../../styles/Form.module.scss';
-import { useSession } from '../../lib/hooks/useSession';
+import { useState } from 'react';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -18,6 +20,7 @@ interface FormData extends UserData {
 }
 
 export function ProfileForm() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { currentUser, updateUser } = useSession();
   const {
     register,
@@ -28,6 +31,7 @@ export function ProfileForm() {
   });
 
   const updateProfile: SubmitHandler<FormData> = async ({ username, email, image, bio }) => {
+    setIsLoading(true);
     const data = await api.updateCurrentUser({ username, email, bio, image });
 
     // TODO при ответе с сервера со статусом 200, но с ключом объекта errors: ['описание ошибки'] сделать соответствующий вывод, либо перенаправление на логин
@@ -37,64 +41,58 @@ export function ProfileForm() {
     } else {
       // TODO модалка об успешном обновлении профиля
       updateUser(data.user);
+      setIsLoading(false);
     }
   };
 
   return (
     <div className={styles.container}>
-      <Paper className={styles.paper} elevation={2}>
+      <Paper className={cn('paper')} elevation={2}>
         <h3 className={styles.title}>Edit Profile</h3>
         <form onSubmit={handleSubmit(updateProfile)}>
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="username">Username</label>
-            </div>
-            <input
-              type="text"
-              placeholder="Username"
-              className={cn({ input: true, red: errors.username })}
-              {...register('username', usernameValidationOptions())}
-            />
-            {errors.username && <span className={styles['error-text']}>{errors.username.message}</span>}
-          </div>
+          <Input
+            type="text"
+            name="username"
+            label="Username"
+            placeholder="Username"
+            error={errors.username}
+            register={register}
+            validationOptions={usernameValidationOptions()}
+          />
 
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="email">Email address</label>
-            </div>
-            <input
-              type="email"
-              placeholder="Email address"
-              className={cn({ input: true, red: errors.email })}
-              {...register('email', emailValidationOptions())}
-            />
-            {errors.email && <span className={styles['error-text']}>{errors.email.message}</span>}
-          </div>
+          <Input
+            type="email"
+            name="email"
+            label="Email address"
+            placeholder="Email address"
+            error={errors.email}
+            register={register}
+            validationOptions={emailValidationOptions()}
+          />
 
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="image">Avatar image (url)</label>
-            </div>
-            <input
-              type="text"
-              placeholder="Avatar image"
-              className={cn({ input: true, red: errors.image })}
-              {...register('image', avatarUrlValidationOptions())}
-            />
-            {errors.image && <span className={styles['error-text']}>{errors.image.message}</span>}
-          </div>
+          <Input
+            type="text"
+            name="image"
+            label="Avatar image (url)"
+            placeholder="Avatar image"
+            error={errors.image}
+            register={register}
+            validationOptions={avatarUrlValidationOptions()}
+          />
 
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="bio">Tell something about you</label>
-            </div>
-            <textarea cols={3} placeholder="But not too much ;)" className={cn({ area: true, red: errors.bio })} {...register('bio')} />
-            {errors.bio && <span className={styles['error-text']}>{errors.bio.message}</span>}
-          </div>
+          <Input
+            type="textarea"
+            rows={3}
+            name="bio"
+            label="Tell something about you"
+            placeholder="But not too much ;)"
+            error={errors.image}
+            register={register}
+          />
 
-          <Button type="submit" className={styles.create} size="large" variant="contained">
+          <LoadingButton loading={isLoading} type="submit" className={styles.create} size="large" variant="contained">
             Save
-          </Button>
+          </LoadingButton>
         </form>
       </Paper>
     </div>

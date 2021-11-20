@@ -1,8 +1,11 @@
+import { useEffect, useRef, useState, MouseEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-
+import { useRouter } from 'next/router';
+import classnames from 'classnames/bind';
 import ReactMarkdown from 'react-markdown';
-import { Paper } from '@mui/material';
+import { Paper, Button, Popper } from '@mui/material';
+import ErrorIcon from '@mui/icons-material/Error';
 
 import { Tags } from '../Tags';
 import { Heart } from '../Heart';
@@ -10,10 +13,11 @@ import { GetArticle, SingleArticle, Error } from '../../lib/types/apiResponses';
 import { formatDate } from '../../lib/helpers/formatDate';
 import { proxyImage } from '../../lib/helpers/proxyImage';
 import { ConduitServices } from '../../lib/services/ConduitServices';
+import { useSession } from '../../lib/hooks/useSession';
 
 import styles from './Article.module.scss';
-import { useEffect, useState } from 'react';
 
+const cn = classnames.bind(styles);
 const api = new ConduitServices();
 
 interface ArticleProps extends SingleArticle {
@@ -34,6 +38,11 @@ export function Article({
 }: ArticleProps) {
   const [likesCount, setlikesCount] = useState<number>(favoritesCount);
   const [isFavorited, setIsFavorited] = useState<boolean>(favorited);
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const { currentUser } = useSession();
+  const router = useRouter();
+  const isOwner = currentUser?.username === username;
 
   //This effect update server-side data since it doesn't know about authentication
   useEffect(() => {
@@ -56,6 +65,18 @@ export function Article({
     }
   }
 
+  const canBeOpen = open && Boolean(anchorEl);
+  const id = canBeOpen ? 'confirmation-popper' : undefined;
+
+  async function showConfirmationDialog(event: MouseEvent<HTMLButtonElement>) {
+    setAnchorEl(event.currentTarget);
+    setOpen((prevOpen) => !prevOpen);
+  }
+
+  async function editArticle() {
+    router.push(`/articles/${slug}/edit`);
+  }
+
   return (
     <Paper className={styles.paper} elevation={2}>
       <div className={styles.content}>
@@ -68,12 +89,40 @@ export function Article({
         <Tags tagList={tagList} />
         <div className={styles.description}>{description}</div>
       </div>
-      <div className={styles.user}>
-        <div className={styles.info}>
-          <div className={styles.userName}>{username}</div>
-          <div className={styles.created}>{formatDate(createdAt)}</div>
+      <div className={styles['user-container']}>
+        <div className={styles.user}>
+          <div className={styles.info}>
+            <div className={styles.userName}>{username}</div>
+            <div className={styles.created}>{formatDate(createdAt)}</div>
+          </div>
+          <Image layout={'fixed'} className={styles.avatar} width={50} height={50} alt="user-image" src={proxyImage(image)} />
         </div>
-        <Image layout={'fixed'} className={styles.avatar} width={50} height={50} alt="user-image" src={proxyImage(image)} />
+        {isFull && isOwner && (
+          <div className={styles.controls}>
+            <Button className={cn('button', 'delete')} variant="outlined" aria-describedby={id} onClick={showConfirmationDialog}>
+              Delete
+            </Button>
+            <Popper id={id} open={open} anchorEl={anchorEl} placement="right-start" disablePortal={false}>
+              <Paper className={styles.popper}>
+                <div className={styles.dialog}>
+                  <ErrorIcon sx={{ color: 'orange' }} />
+                  <div className={styles.warning}>Are you sure to delete this article?</div>
+                </div>
+                <div className={styles.controls}>
+                  <Button variant="outlined" size="small" className={cn('button')}>
+                    No
+                  </Button>
+                  <Button variant="contained" size="small" className={cn('button')}>
+                    Yes
+                  </Button>
+                </div>
+              </Paper>
+            </Popper>
+            <Button className={cn('button', 'edit')} variant="outlined" onClick={editArticle}>
+              Edit
+            </Button>
+          </div>
+        )}
       </div>
       {isFull && (
         <div className={styles.body}>

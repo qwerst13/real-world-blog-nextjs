@@ -18,6 +18,7 @@ import {
 import { useSession } from '../../lib/hooks/useSession';
 
 import styles from '../../styles/Form.module.scss';
+import { Input } from '../Input';
 
 let cn = classNames.bind(styles);
 const api = new ConduitServices();
@@ -58,57 +59,45 @@ export function SignUpForm() {
       <Paper className={styles.paper} elevation={2}>
         <h3 className={styles.title}>Create a new account</h3>
         <form onSubmit={handleSubmit(registration)}>
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="username">Username</label>
-            </div>
-            <input
-              type="text"
-              placeholder="Username"
-              className={cn({ input: true, red: errors.username })}
-              {...register('username', usernameValidationOptions())}
-            />
-            {errors.username && <span className={styles['error-text']}>{errors.username.message}</span>}
-          </div>
+          <Input
+            type="text"
+            name="username"
+            label="Username"
+            placeholder="Username"
+            error={errors.username}
+            register={register}
+            validationOptions={usernameValidationOptions()}
+          />
 
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="email">Email address</label>
-            </div>
-            <input
-              type="email"
-              placeholder="Email address"
-              className={cn({ input: true, red: errors.email })}
-              {...register('email', emailValidationOptions())}
-            />
-            {errors.email && <span className={styles['error-text']}>{errors.email.message}</span>}
-          </div>
+          <Input
+            type="email"
+            name="email"
+            label="Email address"
+            placeholder="Email address"
+            error={errors.email}
+            register={register}
+            validationOptions={emailValidationOptions()}
+          />
 
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="password">Password</label>
-            </div>
-            <input
-              type="password"
-              placeholder="Password"
-              className={cn({ input: true, red: errors.password })}
-              {...register('password', passwordValidationOptions())}
-            />
-            {errors.password && <span className={styles['error-text']}>{errors.password.message}</span>}
-          </div>
+          <Input
+            type="password"
+            name="password"
+            label="Password"
+            placeholder="Password"
+            error={errors.password}
+            register={register}
+            validationOptions={passwordValidationOptions()}
+          />
 
-          <div className={styles.field}>
-            <div className={styles.label}>
-              <label htmlFor="repeatPassword">Repeat Password</label>
-            </div>
-            <input
-              type="password"
-              placeholder="Password"
-              className={cn({ input: true, red: errors.repeatPassword })}
-              {...register('repeatPassword', repeatPasswordValidationOptions(watch('password'), watch('repeatPassword')))}
-            />
-            {errors.repeatPassword && <span className={styles['error-text']}>{errors.repeatPassword.message}</span>}
-          </div>
+          <Input
+            type="password"
+            name="repeatPassword"
+            label="Repeat Password"
+            placeholder="Password"
+            error={errors.repeatPassword}
+            register={register}
+            validationOptions={repeatPasswordValidationOptions(watch('password'), watch('repeatPassword'))}
+          />
 
           <hr className={styles.divider} />
 

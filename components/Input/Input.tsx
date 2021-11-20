@@ -26,7 +26,7 @@ export function Input({ type, name, error, label, placeholder, register, validat
   }
 
   return (
-    <div className={cn('field', 'article')}>
+    <div className={cn('field')}>
       <div className={styles.label}>
         <label htmlFor={name}>{label}</label>
       </div>

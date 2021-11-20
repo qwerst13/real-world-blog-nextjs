@@ -76,14 +76,14 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
 
   return (
     <div className={styles.container}>
-      <Paper className={styles.paper} elevation={2}>
+      <Paper className={cn('paper', 'article')} elevation={2}>
         <h3 className={styles.title}>{isNew ? 'Create new article' : 'Edit article'}</h3>
 
         <form onSubmit={isNew ? handleSubmit(createArticle) : handleSubmit(updateArticle)}>
           <Input
             type="text"
             name="title"
-            label={'Title'}
+            label="Title"
             placeholder="Title"
             error={errors.title}
             register={register}
@@ -93,7 +93,7 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
           <Input
             type="text"
             name="description"
-            label={'Description'}
+            label="Description"
             placeholder="Description"
             error={errors.description}
             register={register}
@@ -104,7 +104,7 @@ export function ArticleForm({ isNew, slug }: ArticleFormProps) {
             type="textarea"
             rows={10}
             name="body"
-            label={'Text'}
+            label="Text"
             placeholder="Enter a text in markdown format"
             error={errors.body}
             register={register}
