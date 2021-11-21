@@ -4,15 +4,16 @@ import { getStorageItem } from '../helpers/localStorage';
 
 type ReqType = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
+class CustomError extends Error {
+  constructor(readonly message: string, readonly status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 export class ConduitServices {
   private host = process.env.NEXT_PUBLIC_API_URL as string;
   private storageKey = process.env.NEXT_PUBLIC_STORAGE_KEY as string;
-
-  readonly unexpectedError: Types.Error = {
-    errors: {
-      body: ['Something went wrong'],
-    },
-  };
 
   private requestOptions<T>(method: ReqType, body?: T) {
     let token: string | undefined;
@@ -37,224 +38,141 @@ export class ConduitServices {
     } else return { method, headers, body: JSON.stringify(body) };
   }
 
-  async login(dataToLogin: DataToLogin): Promise<Types.Login | Types.Error> {
+  private async request<T, U = any>(url: string, method: ReqType = 'GET', data?: U): Promise<T | Types.Error> {
+    let response: Response | undefined;
+
     try {
-      const data = {
-        user: { ...dataToLogin },
-      };
+      if (method === 'GET') {
+        response = await fetch(url, this.requestOptions(method));
+      }
 
-      const response = await fetch(`${this.host}/users/login`, this.requestOptions<typeof data>('POST', data));
+      if (method === 'POST') {
+        response = await fetch(url, this.requestOptions<U>(method, data));
+      }
 
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
+      if (method === 'PUT') {
+        response = await fetch(url, this.requestOptions<U>(method, data));
+      }
+
+      if (method === 'DELETE') {
+        response = await fetch(url, this.requestOptions(method));
+      }
+
+      return await response!.json();
+    } catch (e: any) {
+      throw new CustomError(e.message, response!.status);
     }
+  }
+
+  // User requests
+
+  async login(dataToLogin: DataToLogin) {
+    const data = {
+      user: { ...dataToLogin },
+    };
+
+    return this.request<Types.Login, typeof data>(`${this.host}/users/login`, 'POST', data);
   }
 
   async register(dataToRegistration: DataToRegistration): Promise<Types.Registration | Types.Error> {
-    try {
-      const data = {
-        user: { ...dataToRegistration },
-      };
+    const data = {
+      user: { ...dataToRegistration },
+    };
 
-      const response = await fetch(`${this.host}/users`, this.requestOptions<typeof data>('POST', data));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request<Types.Registration, typeof data>(`${this.host}/users`, 'POST', data);
   }
 
   async getCurrentUser(): Promise<Types.UserInfo | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/user`, this.requestOptions('GET'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request(`${this.host}/user`);
   }
 
-  async updateCurrentUser(dataObj: Partial<Types.UserData>): Promise<Types.UpdateUser | Types.Error> {
-    try {
-      const data = {
-        user: dataObj,
-      };
+  async updateCurrentUser(dataObj: Partial<Types.UserData>) {
+    const data = {
+      user: { ...dataObj },
+    };
 
-      const response = await fetch(`${this.host}/user`, this.requestOptions<typeof data>('PUT', data));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request<Types.UpdateUser | typeof data>(`${this.host}/user`, 'PUT', data);
   }
+
+  // Profile requests
 
   async getProfile(username: string): Promise<Types.ProfileInfo | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/profiles/${username}`, this.requestOptions('GET'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request(`${this.host}/profiles/${username}`);
   }
 
   async followUser(username: string): Promise<Types.ProfileInfo | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/profiles/${username}/follow`, this.requestOptions('POST'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request<Types.ProfileInfo>(`${this.host}/profiles/${username}/follow`, 'POST');
   }
 
   async unfollowUser(username: string): Promise<Types.ProfileInfo | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/profiles/${username}/follow`, this.requestOptions('DELETE'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request<Types.ProfileInfo>(`${this.host}/profiles/${username}/follow`, 'DELETE');
   }
+
+  // Articles requests
 
   async getAllArticles(limit: number = 20, offset: number = 0): Promise<Types.AllArticles | Types.Error> {
     const queryString = `?limit=${limit}&offset=${offset}`;
 
-    try {
-      const response = await fetch(`${this.host}/articles${queryString}`, this.requestOptions('GET'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request(`${this.host}/articles${queryString}`);
   }
 
   async getFollowedArticles(qty: number = 20, page: number = 0): Promise<Types.AllArticles | Types.Error> {
     const queryString = `?limit=${qty}&offset=${page * qty}`;
 
-    try {
-      const response = await fetch(`${this.host}/articles/feed${queryString}`, this.requestOptions('GET'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request(`${this.host}/articles/feed${queryString}`);
   }
 
-  async createArticle(articleData: Pick<Types.SingleArticle, 'title' | 'description' | 'body' | 'tagList'>): Promise<Types.GetArticle | Types.Error> {
+  async createArticle(articleData: Pick<Types.SingleArticle, 'title' | 'description' | 'body' | 'tagList'>) {
     const data: Types.ArticleToCreate = { article: articleData };
 
-    try {
-      const response = await fetch(`${this.host}/articles`, this.requestOptions<typeof data>('POST', data));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request<Types.GetArticle, typeof data>(`${this.host}/articles`, 'POST', data);
   }
 
-  async getArticle(slug: string): Promise<Types.GetArticle | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/articles/${slug}`, this.requestOptions('GET'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+  async getArticle(slug: string) {
+    return this.request<Types.GetArticle>(`${this.host}/articles/${slug}`);
   }
 
-  async updateArticle(
-    slug: string,
-    articleData: Partial<Pick<Types.SingleArticle, 'title' | 'description' | 'body' | 'tagList'>>
-  ): Promise<Types.GetArticle | Types.Error> {
+  async updateArticle(slug: string, articleData: Partial<Pick<Types.SingleArticle, 'title' | 'description' | 'body' | 'tagList'>>) {
     const data = { article: articleData };
 
-    try {
-      const response = await fetch(`${this.host}/articles/${slug}`, this.requestOptions<typeof data>('PUT', data));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request<Types.GetArticle, typeof data>(`${this.host}/articles/${slug}`, 'PUT', data);
   }
 
-  async deleteArticle(slug: string): Promise<boolean | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/articles/${slug}`, this.requestOptions('DELETE'));
-
-      if (response.status === 422) return response.json();
-      return response.ok;
-    } catch (e) {
-      return this.unexpectedError;
-    }
+  async deleteArticle(slug: string) {
+    return this.request<boolean>(`${this.host}/articles/${slug}`, 'DELETE');
   }
+
+  // Comments requests
 
   async getCommentsForArticle(slug: string): Promise<Types.Comments | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/articles/${slug}/comments`, this.requestOptions('GET'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request(`${this.host}/articles/${slug}/comments`);
   }
 
-  async commentArticle(slug: string, comment: string): Promise<Types.GetComment | Types.Error> {
+  async commentArticle(slug: string, comment: string) {
     const body = {
       comment: {
         body: comment,
       },
     };
 
-    try {
-      const response = await fetch(`${this.host}/articles/${slug}/comments`, this.requestOptions('POST', body));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request<Types.GetComment, typeof body>(`${this.host}/articles/${slug}/comments`, 'POST', body);
   }
 
-  async deleteComment(slug: string, id: number): Promise<boolean | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/articles/${slug}/comments/${id}`, this.requestOptions('DELETE'));
-
-      if (response.status === 422) return response.json();
-      return response.ok;
-    } catch (e) {
-      return this.unexpectedError;
-    }
+  async deleteComment(slug: string, id: number) {
+    return this.request<boolean>(`${this.host}/articles/${slug}/comments/${id}`, 'DELETE');
   }
 
-  async favoriteArticle(slug: string): Promise<Types.GetArticle | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/articles/${slug}/favorite`, this.requestOptions('POST'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+  async favoriteArticle(slug: string) {
+    return this.request<Types.GetArticle, string>(`${this.host}/articles/${slug}/favorite`, 'POST');
   }
 
-  async unfavoriteArticle(slug: string): Promise<Types.GetArticle | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/articles/${slug}/favorite`, this.requestOptions('DELETE'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+  async unfavoriteArticle(slug: string) {
+    return this.request<Types.GetArticle>(`${this.host}/articles/${slug}/favorite`, 'DELETE');
   }
+
+  // Tag request
 
   async getTags(): Promise<Types.Tags | Types.Error> {
-    try {
-      const response = await fetch(`${this.host}/tags`, this.requestOptions('GET'));
-
-      return response.json();
-    } catch (e) {
-      return this.unexpectedError;
-    }
+    return this.request(`${this.host}/tags`);
   }
 }

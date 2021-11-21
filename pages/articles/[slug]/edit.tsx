@@ -1,16 +1,30 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
+import useSWR from 'swr';
 
 import { ArticleForm } from '../../../components/Forms/ArticleForm';
-import { CircularProgress } from '@mui/material';
+import { ConduitServices } from '../../../lib/services/ConduitServices';
+import { Loader } from '../../../components/ui/Loader';
 
-type ServerProps = InferGetStaticPropsType<typeof getStaticProps>;
+const api = new ConduitServices();
 
-interface ProfilePageProps extends ServerProps {}
-
-export default function ProfilePage({ slug }: ProfilePageProps) {
+export default function EditArticlePage() {
   const router = useRouter();
+  const { slug } = router.query;
+  const { data, error } = useSWR(`/api/article/${slug}`, () => api.getArticle(slug as string));
+
+  if (!data) return <Loader />;
+  if (error) return <div>Ошибка</div>;
+
+  if ('errors' in data) {
+    const [errorMessage] = data.errors.body;
+
+    if (errorMessage === 'Not found') router.push('/404');
+    else {
+      // TODO выдать ошибку
+      return <div>Error</div>;
+    }
+  }
 
   return (
     <>
@@ -20,29 +34,8 @@ export default function ProfilePage({ slug }: ProfilePageProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* TODO заменить лоадер на что-то более приемлемое */}
-      {router.isFallback && (
-        <div className="container">
-          <CircularProgress className="centered" />
-        </div>
-      )}
-      <ArticleForm isNew={false} slug={slug} />
+      {router.isFallback && <Loader />}
+      <ArticleForm isNew={false} slug={''} />
     </>
   );
 }
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  // TODO после создания класса-сервиса прописать пути
-  return {
-    paths: [],
-    fallback: true,
-  };
-};
-
-export const getStaticProps: GetStaticProps = async (context) => {
-  const slug = context.params!.slug;
-  return {
-    props: {
-      slug,
-    },
-  };
-};

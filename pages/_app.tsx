@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
-import { SWRConfig } from 'swr';
+import { SWRConfig, useSWRConfig } from 'swr';
 
 import { Layout } from '../components/ui/Layout';
 import { useSession } from '../lib/hooks/useSession';

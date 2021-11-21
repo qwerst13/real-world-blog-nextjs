@@ -68,13 +68,20 @@ export function Article({
   const canBeOpen = open && Boolean(anchorEl);
   const id = canBeOpen ? 'confirmation-popper' : undefined;
 
-  async function showConfirmationDialog(event: MouseEvent<HTMLButtonElement>) {
+  function toggleConfirmationDialog(event: MouseEvent<HTMLButtonElement>) {
     setAnchorEl(event.currentTarget);
     setOpen((prevOpen) => !prevOpen);
   }
 
-  async function editArticle() {
+  function editArticle() {
     router.push(`/articles/${slug}/edit`);
+  }
+
+  async function deleteArticle() {
+    const response = await api.deleteArticle(slug);
+    if (typeof response !== 'boolean') return;
+    // TODO отобразить ошибку
+    else router.replace('/');
   }
 
   return (
@@ -99,7 +106,7 @@ export function Article({
         </div>
         {isFull && isOwner && (
           <div className={styles.controls}>
-            <Button className={cn('button', 'delete')} variant="outlined" aria-describedby={id} onClick={showConfirmationDialog}>
+            <Button className={cn('button', 'delete')} variant="outlined" aria-describedby={id} onClick={toggleConfirmationDialog}>
               Delete
             </Button>
             <Popper id={id} open={open} anchorEl={anchorEl} placement="right-start" disablePortal={false}>
@@ -109,10 +116,10 @@ export function Article({
                   <div className={styles.warning}>Are you sure to delete this article?</div>
                 </div>
                 <div className={styles.controls}>
-                  <Button variant="outlined" size="small" className={cn('button')}>
+                  <Button variant="outlined" size="small" className={cn('button')} onClick={toggleConfirmationDialog}>
                     No
                   </Button>
-                  <Button variant="contained" size="small" className={cn('button')}>
+                  <Button variant="contained" size="small" className={cn('button')} onClick={deleteArticle}>
                     Yes
                   </Button>
                 </div>
