@@ -10,7 +10,7 @@ export default function NewArticlePage() {
         <meta name="description" content="Create new article" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ArticleForm isNew={true} />
+      <ArticleForm />
     </>
   );
 }

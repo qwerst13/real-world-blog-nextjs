@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import classNames from 'classnames/bind';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import classNames from 'classnames/bind';
 
-import { useSession } from '../../lib/hooks/useSession';
+import { useSession } from '../../../lib/hooks/useSession';
 
 import styles from './Heart.module.scss';
 

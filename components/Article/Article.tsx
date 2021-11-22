@@ -8,7 +8,7 @@ import { Paper, Button, Popper } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
 
 import { Tags } from '../Tags';
-import { Heart } from '../Heart';
+import { Heart } from '../ui/Heart';
 import { GetArticle, SingleArticle, Error } from '../../lib/types/apiResponses';
 import { formatDate } from '../../lib/helpers/formatDate';
 import { proxyImage } from '../../lib/helpers/proxyImage';

@@ -88,10 +88,10 @@ export class ConduitServices {
 
   async updateCurrentUser(dataObj: Partial<Types.UserData>) {
     const data = {
-      user: { ...dataObj },
+      user: dataObj,
     };
 
-    return this.request<Types.UpdateUser | typeof data>(`${this.host}/user`, 'PUT', data);
+    return this.request<Types.UpdateUser>(`${this.host}/user`, 'PUT', data);
   }
 
   // Profile requests

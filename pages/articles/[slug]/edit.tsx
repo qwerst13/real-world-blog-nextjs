@@ -13,17 +13,16 @@ export default function EditArticlePage() {
   const { slug } = router.query;
   const { data, error } = useSWR(`/api/article/${slug}`, () => api.getArticle(slug as string));
 
+  if (error) {
+    if (error.status === 404) router.push('/404');
+    // TODO отображение ошибки
+    else return <div>Ошибка</div>;
+  }
   if (!data) return <Loader />;
-  if (error) return <div>Ошибка</div>;
 
   if ('errors' in data) {
-    const [errorMessage] = data.errors.body;
-
-    if (errorMessage === 'Not found') router.push('/404');
-    else {
-      // TODO выдать ошибку
-      return <div>Error</div>;
-    }
+    // TODO выдать ошибку
+    return <div>Error</div>;
   }
 
   return (
@@ -35,7 +34,7 @@ export default function EditArticlePage() {
       </Head>
       {/* TODO заменить лоадер на что-то более приемлемое */}
       {router.isFallback && <Loader />}
-      <ArticleForm isNew={false} slug={''} />
+      <ArticleForm articleData={data.article} />
     </>
   );
 }

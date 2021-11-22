@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router';
 import { GetStaticProps, GetStaticPaths, InferGetStaticPropsType } from 'next';
-import { CircularProgress } from '@mui/material';
+import Head from 'next/head';
+import useSWR from 'swr';
 
 import { Article } from '../../../components/Article';
 import { ConduitServices } from '../../../lib/services/ConduitServices';
-import useSWR from 'swr';
-import Head from 'next/head';
+import { Loader } from '../../../components/ui/Loader';
 
 const api = new ConduitServices();
 
@@ -17,13 +17,7 @@ export default function SingleArticlePage({ _ }: singleArticlePageProps) {
   const { slug } = router.query;
   const { data, error } = useSWR(`/api/article/${slug}`, () => api.getArticle(slug as string));
 
-  if (router.isFallback || !data) {
-    return (
-      <div className="container">
-        <CircularProgress className="centered" />
-      </div>
-    );
-  }
+  if (router.isFallback || !data) return <Loader />;
 
   // TODO добавить компонент ошибки
   if ('errors' in data || error) return <div>Error</div>;

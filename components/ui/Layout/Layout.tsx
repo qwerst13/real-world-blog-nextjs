@@ -1,8 +1,9 @@
 import { ReactNode } from 'react';
+import { StyledEngineProvider } from '@mui/material/styles';
 
 import { Header } from '../../Header';
+import ErrorBoundary from '../../ErrorBoundary/ErrorBoundary';
 
-import { StyledEngineProvider } from '@mui/material/styles';
 import styles from './Layout.module.scss';
 
 interface LayoutProps {
@@ -13,8 +14,10 @@ export function Layout({ children }: LayoutProps) {
   return (
     <StyledEngineProvider injectFirst>
       <div className={styles.container}>
-        <Header />
-        {children}
+        <ErrorBoundary>
+          <Header />
+        </ErrorBoundary>
+        <ErrorBoundary>{children}</ErrorBoundary>
       </div>
     </StyledEngineProvider>
   );

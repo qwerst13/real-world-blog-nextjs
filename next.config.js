@@ -8,9 +8,14 @@ module.exports = {
         destination: '/',
         permanent: true,
       },
+      {
+        source: '/1',
+        destination: '/',
+        permanent: true,
+      }
     ]
   },
   images: {
-    domains: ['api.realworld.io'],
+    domains: [],
   }
 }

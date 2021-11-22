@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Button, CircularProgress } from '@mui/material';
+import { Button } from '@mui/material';
 import { useRouter } from 'next/router';
 
-import styles from './Header.module.scss';
 import { proxyImage } from '../../lib/helpers/proxyImage';
 import { useSession } from '../../lib/hooks/useSession';
+
+import styles from './Header.module.scss';
 
 export function Header() {
   const router = useRouter();
