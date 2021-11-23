@@ -1,14 +1,15 @@
-import Head from 'next/head';
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { Pagination } from '@mui/material';
 
 import { ArticlesList } from '../components/ArticlesList';
-import { ConduitServices } from '../lib/services/ConduitServices';
 import { Loader } from '../components/ui/Loader';
+import { Alert } from '../components/ui/Alert';
+import { ConduitServices } from '../lib/services/ConduitServices';
 
-import styles from '../styles/HomePage.module.css';
+import styles from '../styles/HomePage.module.scss';
 
 const api = new ConduitServices();
 
@@ -19,10 +20,17 @@ export default function HomePage({ _ }: HomePageProps) {
   const { data, error } = useSWR(`/api/articles?limit=20&offset=0`, () => api.getAllArticles());
   const router = useRouter();
 
+  if (error) {
+    const message = error.message;
+    return <Alert severity="error">{message}</Alert>;
+  }
+
   if (!data) return <Loader />;
 
-  // TODO добавить показ ошибок
-  if (error || 'errors' in data) return <div>Error</div>;
+  if ('errors' in data) {
+    const message = Object.entries(data.errors).join(' ');
+    return <Alert severity="warning">{message}</Alert>;
+  }
 
   const totalPages = Math.ceil(data.articlesCount / 20);
   return (
@@ -30,19 +38,16 @@ export default function HomePage({ _ }: HomePageProps) {
       <Head>
         <title>Realworld Blog</title>
         <meta name="description" content="List of all articles" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <ArticlesList {...data} />
-      <Pagination className={styles.pagination} page={1} count={totalPages} onChange={(_, page) => router.push(`/${page}`)} />
+      <Pagination className={styles.pagination} page={1} count={totalPages} onChange={(_, page) => router.push(`/articles/${page}`)} />
     </>
   );
 }
 
-//TODO подумать про использование т.к. это одна из 2-х страниц, которым потенциально нужна прегенерация
 export const getStaticProps: GetStaticProps = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles?limit=20&offset=0`);
-  const articles = await response.json();
+  const articles = await api.getAllArticles();
 
   return {
     props: {
@@ -50,6 +55,6 @@ export const getStaticProps: GetStaticProps = async () => {
         '/api/articles?limit=20&offset=0': articles,
       },
     },
-    revalidate: 30,
+    revalidate: 1,
   };
 };

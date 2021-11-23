@@ -1,6 +1,7 @@
-import { Paper } from '@mui/material';
+import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import classNames from 'classnames/bind';
+import { Paper } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { ConduitServices } from '../../lib/services/ConduitServices';
@@ -8,11 +9,11 @@ import { UserData } from '../../lib/types/apiResponses';
 import { usernameValidationOptions, emailValidationOptions, avatarUrlValidationOptions } from '../../lib/helpers/validators';
 import { useSession } from '../../lib/hooks/useSession';
 import { Input } from '../Input';
+import { Dialog } from '../ui/Dialog';
 
 import styles from '../../styles/Form.module.scss';
-import { useState } from 'react';
 
-let cn = classNames.bind(styles);
+const cn = classNames.bind(styles);
 const api = new ConduitServices();
 
 interface FormData extends UserData {
@@ -21,6 +22,8 @@ interface FormData extends UserData {
 
 export function ProfileForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
   const { currentUser, updateUser } = useSession();
   const {
     register,
@@ -32,18 +35,30 @@ export function ProfileForm() {
 
   const updateProfile: SubmitHandler<FormData> = async ({ username, email, image, bio }) => {
     setIsLoading(true);
-    const data = await api.updateCurrentUser({ username, email, bio, image });
 
-    // TODO при ответе с сервера со статусом 200, но с ключом объекта errors: ['описание ошибки'] сделать соответствующий вывод, либо перенаправление на логин
-    if ('errors' in data) {
-      const message = data.errors;
-      console.log(message);
-    } else {
-      // TODO модалка об успешном обновлении профиля
-      updateUser(data.user);
+    try {
+      const data = await api.updateCurrentUser({ username, email, bio, image });
+
+      if ('errors' in data) {
+        setMessage(Object.entries(data.errors).join(' '));
+        setIsLoading(false);
+        setIsOpen(true);
+      } else {
+        updateUser(data.user);
+        setMessage('Succesfully updated!');
+        setIsLoading(false);
+        setIsOpen(true);
+      }
+    } catch (e) {
+      setMessage('Something went wrong. Check your Internet connection and try again.');
       setIsLoading(false);
+      setIsOpen(true);
     }
   };
+
+  function closeDialog() {
+    setIsOpen(false);
+  }
 
   return (
     <div className={styles.container}>
@@ -95,6 +110,10 @@ export function ProfileForm() {
           </LoadingButton>
         </form>
       </Paper>
+
+      <Dialog open={isOpen} onClose={closeDialog} title="Profile">
+        {message}
+      </Dialog>
     </div>
   );
 }

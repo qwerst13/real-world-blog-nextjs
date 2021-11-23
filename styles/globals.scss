@@ -5,9 +5,9 @@
 
 html,
 body {
-  background: #EBEEF3;
-  font-family:-apple-system, 'Inter', 'Roboto', sans-serif, BlinkMacSystemFont, Segoe UI, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue;
+  background: #ebeef3;
+  font-family: -apple-system, 'Inter', 'Roboto', sans-serif, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue;
 }
 
 a {
@@ -16,7 +16,9 @@ a {
   text-decoration: none;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;

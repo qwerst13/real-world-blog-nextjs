@@ -9,11 +9,12 @@ import { ConduitServices } from '../../lib/services/ConduitServices';
 import { SingleArticle } from '../../lib/types/apiResponses';
 import { Input } from '../Input';
 import { TagList } from '../TagList';
+import { Tags } from '../ui/Tags';
+import { Dialog } from '../ui/Dialog';
 
 import styles from '../../styles/Form.module.scss';
-import { Tags } from '../Tags';
 
-let cn = classNames.bind(styles);
+const cn = classNames.bind(styles);
 const api = new ConduitServices();
 
 interface ArticleFormProps {
@@ -29,6 +30,8 @@ interface FormData {
 
 export function ArticleForm({ articleData }: ArticleFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const router = useRouter();
 
   const defaultValues = articleData
@@ -45,31 +48,51 @@ export function ArticleForm({ articleData }: ArticleFormProps) {
 
   const createArticle: SubmitHandler<FormData> = async ({ title, description, body, tagList }) => {
     setIsLoading(true);
+
     const tags = tagList.map((item) => (item.tag.trim() ? item.tag : undefined)).filter((item) => item) as string[];
 
-    const data = await api.createArticle({ title, description, body, tagList: tags });
+    try {
+      const data = await api.createArticle({ title, description, body, tagList: tags });
 
-    // TODO при ответе с сервера со статусом 200, но с ключом объекта errors: ['описание ошибки'] сделать соответствующий вывод
-    if ('errors' in data) {
-      const message = data.errors;
-      console.log(message);
-    } else {
-      router.push('/');
+      if ('errors' in data) {
+        setErrorMessage(Object.entries(data.errors).join(' '));
+        setIsLoading(false);
+        setIsOpen(true);
+      } else {
+        const { slug } = data.article;
+        router.push(`/article/${slug}`);
+      }
+    } catch (e) {
+      setErrorMessage('Something went wrong. Check your Internet connection and try again.');
+      setIsLoading(false);
+      setIsOpen(true);
     }
   };
 
   const updateArticle: SubmitHandler<FormData> = async ({ title, description, body }) => {
     setIsLoading(true);
-    const data = await api.updateArticle(articleData!.slug, { title, description, body });
 
-    // TODO при ответе с сервера со статусом 200, но с ключом объекта errors: ['описание ошибки'] сделать соответствующий вывод
-    if ('errors' in data) {
-      const message = data.errors;
-      console.log(message);
-    } else {
-      router.push('/');
+    try {
+      const data = await api.updateArticle(articleData!.slug, { title, description, body });
+
+      if ('errors' in data) {
+        setErrorMessage(Object.entries(data.errors).join(' '));
+        setIsLoading(false);
+        setIsOpen(true);
+      } else {
+        const { slug } = data.article;
+        router.push(`/article/${slug}`);
+      }
+    } catch (e) {
+      setErrorMessage('Something went wrong. Check your Internet connection and try again.');
+      setIsLoading(false);
+      setIsOpen(true);
     }
   };
+
+  function closeDialog() {
+    setIsOpen(false);
+  }
 
   useEffect(() => {
     setFocus('title');
@@ -119,6 +142,10 @@ export function ArticleForm({ articleData }: ArticleFormProps) {
           </LoadingButton>
         </form>
       </Paper>
+
+      <Dialog open={isOpen} onClose={closeDialog} title="Article error">
+        {errorMessage}
+      </Dialog>
     </div>
   );
 }

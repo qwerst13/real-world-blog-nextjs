@@ -1,7 +1,7 @@
 import { Component, ErrorInfo } from 'react';
 import { Alert } from '@mui/material';
 
-export default class ErrorBoundary extends Component {
+export class ErrorBoundary extends Component {
   state = {
     hasError: false,
   };

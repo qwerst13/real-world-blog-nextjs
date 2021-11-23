@@ -38,7 +38,7 @@ export class ConduitServices {
     } else return { method, headers, body: JSON.stringify(body) };
   }
 
-  private async request<T, U = any>(url: string, method: ReqType = 'GET', data?: U): Promise<T | Types.Error> {
+  private async request<T = any, U = any>(url: string, method: ReqType = 'GET', data?: U): Promise<T | Types.Error> {
     let response: Response | undefined;
 
     try {
@@ -56,11 +56,13 @@ export class ConduitServices {
 
       if (method === 'DELETE') {
         response = await fetch(url, this.requestOptions(method));
+
+        if (response.status === 204) return Promise.resolve(true as any);
       }
 
       return await response!.json();
     } catch (e: any) {
-      throw new CustomError(e.message, response!.status);
+      throw new CustomError(e.message, response?.status || 504);
     }
   }
 

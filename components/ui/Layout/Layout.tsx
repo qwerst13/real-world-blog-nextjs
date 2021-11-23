@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { StyledEngineProvider } from '@mui/material/styles';
 
 import { Header } from '../../Header';
-import ErrorBoundary from '../../ErrorBoundary/ErrorBoundary';
+import { ErrorBoundary } from '../../ErrorBoundary';
 
 import styles from './Layout.module.scss';
 

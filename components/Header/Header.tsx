@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Button } from '@mui/material';
 import { useRouter } from 'next/router';
+import { Button } from '@mui/material';
 
 import { proxyImage } from '../../lib/helpers/proxyImage';
 import { useSession } from '../../lib/hooks/useSession';

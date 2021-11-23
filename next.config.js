@@ -9,7 +9,12 @@ module.exports = {
         permanent: true,
       },
       {
-        source: '/1',
+        source: '/articles/1',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/article',
         destination: '/',
         permanent: true,
       }

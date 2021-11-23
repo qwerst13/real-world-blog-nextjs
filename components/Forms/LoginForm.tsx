@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import classNames from 'classnames/bind';
 import { Paper } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
@@ -10,17 +9,19 @@ import { ConduitServices } from '../../lib/services/ConduitServices';
 import { DataToLogin } from '../../lib/types/apiResponses';
 import { emailValidationOptions, passwordValidationOptions } from '../../lib/helpers/validators';
 import { useSession } from '../../lib/hooks/useSession';
+import { Input } from '../Input';
+import { Dialog } from '../ui/Dialog';
 
 import styles from '../../styles/Form.module.scss';
-import { Input } from '../Input';
 
-let cn = classNames.bind(styles);
 const api = new ConduitServices();
 
 interface FormData extends DataToLogin {}
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const router = useRouter();
   const { updateUser } = useSession();
   const {
@@ -31,18 +32,29 @@ export function LoginForm() {
 
   const login: SubmitHandler<FormData> = async ({ email, password }) => {
     setIsLoading(true);
-    const data = await api.login({ email, password });
 
-    // TODO при ответе с сервера со статусом 200, но с ключом объекта errors: ['описание ошибки'] сделать соответствующий вывод
-    // TODO не забыть отключить загрузку в кнопке при ошибке
-    if ('errors' in data) {
-      const message = data.errors;
-      console.log(message);
-    } else {
-      updateUser(data.user);
-      router.push('/').then(() => setIsLoading(false));
+    try {
+      const data = await api.login({ email, password });
+
+      if ('errors' in data) {
+        setErrorMessage(Object.entries(data.errors).join(' '));
+        setIsLoading(false);
+        setIsOpen(true);
+      } else {
+        updateUser(data.user);
+        setIsLoading(false);
+        router.push('/');
+      }
+    } catch (e) {
+      setErrorMessage('Something went wrong. Check your Internet connection and try again.');
+      setIsLoading(false);
+      setIsOpen(true);
     }
   };
+
+  function closeDialog() {
+    setIsOpen(false);
+  }
 
   return (
     <div className={styles.container}>
@@ -82,6 +94,10 @@ export function LoginForm() {
           </Link>
         </div>
       </Paper>
+
+      <Dialog open={isOpen} onClose={closeDialog} title="Login error">
+        {errorMessage}
+      </Dialog>
     </div>
   );
 }
